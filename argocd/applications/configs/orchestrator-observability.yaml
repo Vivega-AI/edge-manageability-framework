@@ -287,3 +287,16 @@ opentelemetry-collector-daemonset:
                     port: 8888
                     without_type_suffix: true
                     without_units: true
+
+# Override replication factor for single-node
+mimir-distributed:
+  mimir:
+    structuredConfig:
+      common:
+        replication_factor: 1
+      ingester:
+        ring:
+          replication_factor: 1
+      store_gateway:
+        sharding_ring:
+          replication_factor: 1
