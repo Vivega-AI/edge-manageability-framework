@@ -240,3 +240,37 @@ argo:
               memory: 256Mi
         structuredConfig:
           metricsRetentionPeriod: 24h
+    orchestrator:
+      mimir:
+        replicationFactor: 1
+        ingester:
+          replicas: 1
+        storeGateway:
+          replicas: 1
+        distributor:
+          replicas: 1
+        querier:
+          replicas: 1
+      loki:
+        replicationFactor: 1
+        write:
+          replicas: 1
+        read:
+          replicas: 1
+    edgeNode:
+      mimir:
+        replicationFactor: 1
+        ingester:
+          replicas: 1
+        storeGateway:
+          replicas: 1
+        distributor:
+          replicas: 1
+        querier:
+          replicas: 1
+      loki:
+        replicationFactor: 1
+        write:
+          replicas: 1
+        read:
+          replicas: 1
