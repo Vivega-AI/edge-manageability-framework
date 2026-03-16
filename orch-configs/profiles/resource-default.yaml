@@ -1,6 +1,16 @@
 # SPDX-FileCopyrightText: 2025 Intel Corporation
 #
 # SPDX-License-Identifier: Apache-2.0
+#
+# resource-default.yaml
+# Tuned for: single-node on-prem, ~80GB RAM, full stack, single tenancy
+# Changes from original:
+#   - requests: kept minimal (1m cpu, realistic memory) for scheduler signal
+#   - limits: reduced from unlimited 64Gi to realistic per-service caps
+#   - Istio proxy sidecar: kept very lean (injected into every pod)
+#   - O11y (Mimir/Loki): biggest consumers, given generous but bounded limits
+#   - Platform services (Keycloak, Vault, PostgreSQL): medium limits
+#   - UI / small controllers: small limits
 
 argo:
   resources:
@@ -8,579 +18,580 @@ argo:
       adm:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "128Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "1"
+          memory: "512Mi"
       gateway:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "64Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "500m"
+          memory: "256Mi"
       openpolicyagent:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "64Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "500m"
+          memory: "256Mi"
     appResourceManager:
       root:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "128Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "1"
+          memory: "512Mi"
       vncProxyResources:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "32Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "200m"
+          memory: "128Mi"
     appServiceProxy:
       requests:
         cpu: "1m"
-        memory: "1Mi"
+        memory: "64Mi"
       limits:
-        cpu: "64"
-        memory: "64Gi"
+        cpu: "500m"
+        memory: "256Mi"
     authService:
       requests:
         cpu: "1m"
-        memory: "1Mi"
+        memory: "64Mi"
       limits:
-        cpu: "64"
-        memory: "64Gi"
+        cpu: "500m"
+        memory: "256Mi"
     awsSmProxy:
       requests:
         cpu: "1m"
-        memory: "1Mi"
+        memory: "32Mi"
       limits:
-        cpu: "64"
-        memory: "64Gi"
+        cpu: "200m"
+        memory: "128Mi"
     botkube:
       requests:
         cpu: "1m"
-        memory: "1Mi"
+        memory: "64Mi"
       limits:
-        cpu: "64"
-        memory: "64Gi"
+        cpu: "500m"
+        memory: "256Mi"
     catalogService:
       requests:
         cpu: "1m"
-        memory: "1Mi"
+        memory: "64Mi"
       limits:
-        cpu: "64"
-        memory: "64Gi"
+        cpu: "500m"
+        memory: "256Mi"
     certManager:
       root:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "64Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "500m"
+          memory: "256Mi"
       cainjector:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "64Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "500m"
+          memory: "256Mi"
       webhook:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "32Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "200m"
+          memory: "128Mi"
     certificateFileServer:
       requests:
         cpu: "1m"
-        memory: "1Mi"
+        memory: "32Mi"
       limits:
-        cpu: "64"
-        memory: "64Gi"
+        cpu: "200m"
+        memory: "128Mi"
     capiOperator:
       requests:
         cpu: "1m"
-        memory: "1Mi"
+        memory: "128Mi"
       limits:
-        cpu: "64"
-        memory: "64Gi"
+        cpu: "1"
+        memory: "512Mi"
     clusterConnectGateway:
       gateway:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "128Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "1"
+          memory: "512Mi"
       controller:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "64Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "500m"
+          memory: "256Mi"
     clusterManager:
       clusterManager:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "128Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "1"
+          memory: "512Mi"
       templateController:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "64Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "500m"
+          memory: "256Mi"
     intelInfraProvider:
       manager:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "128Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "1"
+          memory: "512Mi"
       southboundApi:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "64Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "500m"
+          memory: "256Mi"
     configProvisioner:
       requests:
         cpu: "1m"
-        memory: "1Mi"
+        memory: "64Mi"
       limits:
-        cpu: "64"
-        memory: "64Gi"
+        cpu: "500m"
+        memory: "256Mi"
     externalSecrets:
       root:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "64Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "500m"
+          memory: "256Mi"
       certController:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "32Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "200m"
+          memory: "128Mi"
       webhook:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "32Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "200m"
+          memory: "128Mi"
     harborOci:
       core:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "256Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "1"
+          memory: "1Gi"
       database:
         internal:
           initContainer:
             migrator:
               requests:
                 cpu: "1m"
-                memory: "1Mi"
+                memory: "32Mi"
               limits:
-                cpu: "64"
-                memory: "64Gi"
+                cpu: "200m"
+                memory: "128Mi"
             permissions:
               requests:
                 cpu: "1m"
-                memory: "1Mi"
+                memory: "32Mi"
               limits:
-                cpu: "64"
-                memory: "64Gi"
+                cpu: "200m"
+                memory: "128Mi"
           root:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "128Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "1"
+              memory: "512Mi"
       exporter:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "32Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "200m"
+          memory: "128Mi"
       jobservice:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "128Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "1"
+          memory: "512Mi"
       nginx:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "32Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "200m"
+          memory: "128Mi"
       portal:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "32Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "200m"
+          memory: "128Mi"
       redis:
         internal:
           requests:
             cpu: "1m"
-            memory: "1Mi"
+            memory: "64Mi"
           limits:
-            cpu: "64"
-            memory: "64Gi"
+            cpu: "500m"
+            memory: "256Mi"
       registry:
         registry:
           requests:
             cpu: "1m"
-            memory: "1Mi"
+            memory: "128Mi"
           limits:
-            cpu: "64"
-            memory: "64Gi"
+            cpu: "1"
+            memory: "512Mi"
         controller:
           requests:
             cpu: "1m"
-            memory: "1Mi"
+            memory: "32Mi"
           limits:
-            cpu: "64"
-            memory: "64Gi"
+            cpu: "200m"
+            memory: "128Mi"
       trivy:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "128Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "1"
+          memory: "512Mi"
     iamUmbrella:
       nexusApiGw:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "128Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "1"
+          memory: "512Mi"
       tenancyManager:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "64Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "500m"
+          memory: "256Mi"
     ingressNginx:
       controller:
         root:
           requests:
             cpu: "1m"
-            memory: "1Mi"
+            memory: "128Mi"
           limits:
-            cpu: "64"
-            memory: "64Gi"
+            cpu: "1"
+            memory: "512Mi"
         admissionWebhooks:
           createSecretJob:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "32Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "200m"
+              memory: "128Mi"
     ingressHaproxy:
       controller:
         root:
           requests:
             cpu: "1m"
-            memory: "1Mi"
+            memory: "128Mi"
           limits:
-            cpu: "64"
-            memory: "64Gi"
+            cpu: "1"
+            memory: "512Mi"
+    # Istio sidecar is injected into EVERY pod — keep very lean
     istiod:
       global:
         proxy:
           requests:
             cpu: "1m"
-            memory: "1Mi"
+            memory: "64Mi"
           limits:
-            cpu: "64"
-            memory: "64Gi"
+            cpu: "200m"
+            memory: "128Mi"
       pilot:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "128Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "1"
+          memory: "512Mi"
     keycloakTenantController:
       requests:
         cpu: "1m"
-        memory: "1Mi"
+        memory: "64Mi"
       limits:
-        cpu: "64"
-        memory: "64Gi"
+        cpu: "500m"
+        memory: "256Mi"
     kiali:
       deployment:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "64Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "500m"
+          memory: "256Mi"
     malwareScanner:
       requests:
         cpu: "1m"
-        memory: "1Mi"
+        memory: "128Mi"
       limits:
-        cpu: "64"
-        memory: "64Gi"
+        cpu: "1"
+        memory: "512Mi"
     namespaceLabel:
       requests:
         cpu: "1m"
-        memory: "1Mi"
+        memory: "32Mi"
       limits:
-        cpu: "64"
-        memory: "64Gi"
+        cpu: "200m"
+        memory: "128Mi"
     traefik:
       requests:
         cpu: "1m"
-        memory: "1Mi"
+        memory: "128Mi"
       limits:
-        cpu: "64"
-        memory: "64Gi"
+        cpu: "1"
+        memory: "512Mi"
     vault:
       server:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "256Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "1"
+          memory: "1Gi"
       injector:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "64Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "500m"
+          memory: "256Mi"
     postgresql:
       primary:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "256Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "2"
+          memory: "2Gi"
       cluster:
         requests:
           cpu: "1m"
           memory: "256Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "1"
+          memory: "1Gi"
     kyverno:
       admissionController:
         initContainer:
           requests:
             cpu: "1m"
-            memory: "1Mi"
+            memory: "32Mi"
           limits:
-            cpu: "64"
-            memory: "64Gi"
+            cpu: "200m"
+            memory: "128Mi"
         container:
           requests:
             cpu: "1m"
-            memory: "1Mi"
+            memory: "128Mi"
           limits:
-            cpu: "64"
-            memory: "64Gi"
+            cpu: "1"
+            memory: "512Mi"
       backgroundController:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "64Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "500m"
+          memory: "256Mi"
       cleanupController:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "64Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "500m"
+          memory: "256Mi"
       reportsController:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "64Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "500m"
+          memory: "256Mi"
     webUiRoot:
       requests:
         cpu: "1m"
-        memory: "1Mi"
+        memory: "64Mi"
       limits:
-        cpu: "64"
-        memory: "64Gi"
+        cpu: "500m"
+        memory: "256Mi"
     webUiInfra:
       requests:
         cpu: "1m"
-        memory: "1Mi"
+        memory: "64Mi"
       limits:
-        cpu: "64"
-        memory: "64Gi"
+        cpu: "500m"
+        memory: "256Mi"
     webUiAdmin:
       requests:
         cpu: "1m"
-        memory: "1Mi"
+        memory: "64Mi"
       limits:
-        cpu: "64"
-        memory: "64Gi"
+        cpu: "500m"
+        memory: "256Mi"
     webUiAppOrch:
       requests:
         cpu: "1m"
-        memory: "1Mi"
+        memory: "64Mi"
       limits:
-        cpu: "64"
-        memory: "64Gi"
+        cpu: "500m"
+        memory: "256Mi"
     webUiClusterOrch:
       requests:
         cpu: "1m"
-        memory: "1Mi"
+        memory: "64Mi"
       limits:
-        cpu: "64"
-        memory: "64Gi"
+        cpu: "500m"
+        memory: "256Mi"
     metadataBroker:
       root:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "64Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "500m"
+          memory: "256Mi"
       opaResources:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "64Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "500m"
+          memory: "256Mi"
     sreExporter:
       metricsExporter:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "64Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "500m"
+          memory: "256Mi"
       otelCollector:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "64Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "500m"
+          memory: "256Mi"
       configReloader:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "32Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "200m"
+          memory: "128Mi"
     orchestratorPrometheusAgent:
       prometheusOperator:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "64Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "500m"
+          memory: "256Mi"
       kubeStateMetrics:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "64Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "500m"
+          memory: "256Mi"
       prometheus:
         prometheusSpec:
           requests:
             cpu: "1m"
-            memory: "1Mi"
+            memory: "256Mi"
           limits:
-            cpu: "64"
-            memory: "64Gi"
+            cpu: "2"
+            memory: "2Gi"
     platformKeycloak:
       requests:
         cpu: "1m"
-        memory: "1Mi"
+        memory: "512Mi"
       limits:
-        cpu: "64"
-        memory: "64Gi"
+        cpu: "2"
+        memory: "2Gi"
     rsProxy:
       requests:
         cpu: "1m"
-        memory: "1Mi"
+        memory: "64Mi"
       limits:
-        cpu: "64"
-        memory: "64Gi"
+        cpu: "500m"
+        memory: "256Mi"
     tokenRefresh:
       requests:
         cpu: "1m"
-        memory: "1Mi"
+        memory: "32Mi"
       limits:
-        cpu: "64"
-        memory: "64Gi"
+        cpu: "200m"
+        memory: "128Mi"
     tokenFileServer:
       requests:
         cpu: "1m"
-        memory: "1Mi"
+        memory: "32Mi"
       limits:
-        cpu: "64"
-        memory: "64Gi"
+        cpu: "200m"
+        memory: "128Mi"
     reloader:
       requests:
         cpu: "1m"
-        memory: "1Mi"
+        memory: "32Mi"
       limits:
-        cpu: "64"
-        memory: "64Gi"
+        cpu: "200m"
+        memory: "128Mi"
     appOrchTenantController:
       configProvisioner:
         requests:
           cpu: "1m"
-          memory: "1Mi"
+          memory: "64Mi"
         limits:
-          cpu: "64"
-          memory: "64Gi"
+          cpu: "500m"
+          memory: "256Mi"
     certSynchronizer:
       requests:
         cpu: "1m"
-        memory: "1Mi"
+        memory: "32Mi"
       limits:
-        cpu: "64"
-        memory: "64Gi"
+        cpu: "200m"
+        memory: "128Mi"
 # For o11y only, we are using the format that is compatible with previous version
   o11y:
     alertingMonitor:
@@ -588,387 +599,389 @@ argo:
         resources:
           requests:
             cpu: "1m"
-            memory: "1Mi"
+            memory: "64Mi"
           limits:
-            cpu: "64"
-            memory: "64Gi"
+            cpu: "500m"
+            memory: "256Mi"
         configmapReload:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "32Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "200m"
+              memory: "128Mi"
+    # orchestrator stack — monitors the orchestrator platform itself
     orchestrator:
       grafana:
         resources:
           requests:
             cpu: "1m"
-            memory: "1Mi"
+            memory: "128Mi"
           limits:
-            cpu: "64"
-            memory: "64Gi"
+            cpu: "1"
+            memory: "512Mi"
         sidecar:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "32Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "200m"
+              memory: "128Mi"
         grafana_proxy:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "32Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "200m"
+              memory: "128Mi"
       loki:
         write:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "256Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "1"
+              memory: "1Gi"
         read:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "256Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "1"
+              memory: "1Gi"
         gateway:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "64Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "500m"
+              memory: "256Mi"
         backend:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "128Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "1"
+              memory: "512Mi"
         memcachedExporter:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "32Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "200m"
+              memory: "128Mi"
         chunksCache:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "256Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "1"
+              memory: "1Gi"
         resultsCache:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "64Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "500m"
+              memory: "256Mi"
         sidecar:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "32Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "200m"
+              memory: "128Mi"
       mimir:
         resources:
           requests:
             cpu: "1m"
-            memory: "1Mi"
+            memory: "128Mi"
           limits:
-            cpu: "64"
-            memory: "64Gi"
+            cpu: "1"
+            memory: "512Mi"
         distributor:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "256Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "1"
+              memory: "1Gi"
         storeGateway:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "256Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "1"
+              memory: "1Gi"
         ingester:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "512Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "2"
+              memory: "2Gi"
         compactor:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "256Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "1"
+              memory: "1Gi"
         querier:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "256Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "1"
+              memory: "1Gi"
         query_frontend:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "128Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "1"
+              memory: "512Mi"
         ruler:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "64Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "500m"
+              memory: "256Mi"
         minio:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "256Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "1"
+              memory: "1Gi"
         gateway:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "64Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "500m"
+              memory: "256Mi"
       opentelemetryCollector:
         resources:
           requests:
             cpu: "1m"
-            memory: "1Mi"
+            memory: "64Mi"
           limits:
-            cpu: "64"
-            memory: "64Gi"
+            cpu: "500m"
+            memory: "256Mi"
       opentelemetryCollectorDaemonset:
         resources:
           requests:
             cpu: "1m"
-            memory: "1Mi"
+            memory: "64Mi"
           limits:
-            cpu: "64"
-            memory: "64Gi"
+            cpu: "500m"
+            memory: "256Mi"
+    # edgeNode stack — monitors your actual edge devices
     edgeNode:
       grafana:
         resources:
           requests:
             cpu: "1m"
-            memory: "1Mi"
+            memory: "128Mi"
           limits:
-            cpu: "64"
-            memory: "64Gi"
+            cpu: "1"
+            memory: "512Mi"
         sidecar:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "32Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "200m"
+              memory: "128Mi"
         grafana_proxy:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "32Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "200m"
+              memory: "128Mi"
       loki:
         write:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "256Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "1"
+              memory: "1Gi"
         read:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "256Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "1"
+              memory: "1Gi"
         gateway:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "64Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "500m"
+              memory: "256Mi"
         backend:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "128Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "1"
+              memory: "512Mi"
         memcachedExporter:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "32Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "200m"
+              memory: "128Mi"
         chunksCache:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "256Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "1"
+              memory: "1Gi"
         resultsCache:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "64Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "500m"
+              memory: "256Mi"
         sidecar:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "32Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "200m"
+              memory: "128Mi"
       mimir:
         resources:
           requests:
             cpu: "1m"
-            memory: "1Mi"
+            memory: "128Mi"
           limits:
-            cpu: "64"
-            memory: "64Gi"
+            cpu: "1"
+            memory: "512Mi"
         distributor:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "256Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "1"
+              memory: "1Gi"
         storeGateway:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "256Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "1"
+              memory: "1Gi"
         ingester:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "512Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "2"
+              memory: "2Gi"
         compactor:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "256Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "1"
+              memory: "1Gi"
         querier:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "256Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "1"
+              memory: "1Gi"
         query_frontend:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "128Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "1"
+              memory: "512Mi"
         query:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "128Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "1"
+              memory: "512Mi"
         ruler:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "64Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "500m"
+              memory: "256Mi"
         minio:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "256Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "1"
+              memory: "1Gi"
         gateway:
           resources:
             requests:
               cpu: "1m"
-              memory: "1Mi"
+              memory: "64Mi"
             limits:
-              cpu: "64"
-              memory: "64Gi"
+              cpu: "500m"
+              memory: "256Mi"
       opentelemetryCollector:
         resources:
           requests:
             cpu: "1m"
-            memory: "1Mi"
+            memory: "64Mi"
           limits:
-            cpu: "64"
-            memory: "64Gi"
+            cpu: "500m"
+            memory: "256Mi"

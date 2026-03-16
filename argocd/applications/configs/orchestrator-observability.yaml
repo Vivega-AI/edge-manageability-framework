@@ -1,17 +1,112 @@
 # SPDX-FileCopyrightText: 2025 Intel Corporation
 #
 # SPDX-License-Identifier: Apache-2.0
+# Tuned for: single-node 32GB, 20 edge devices
+# Resources reduced from 64Gi unlimited to realistic limits
 
 loki:
   loki:
     storage:
       s3:
         endpoint: orchestrator-observability-minio:9000
+    commonConfig:
+      replication_factor: 1
   minio:
     image:
       tag: RELEASE.2025-09-07T16-13-09Z
     mcImage:
       tag: RELEASE.2025-08-13T08-35-41Z
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        cpu: "1"
+        memory: 512Mi
+  read:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        cpu: "1"
+        memory: 512Mi
+  write:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        cpu: "1"
+        memory: 512Mi
+  backend:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        cpu: "1"
+        memory: 512Mi
+  gateway:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 500m
+        memory: 128Mi
+  chunksCache:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+  resultsCache:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 500m
+        memory: 128Mi
+  memcachedExporter:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 200m
+        memory: 64Mi
+  sidecar:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 200m
+        memory: 128Mi
+
+grafana:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 128Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
+  sidecar:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 200m
+        memory: 128Mi
 
 mimir-distributed:
   minio:
@@ -27,12 +122,84 @@ mimir-distributed:
       exitCommand: ""
     makePolicyJob:
       exitCommand: ""
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        cpu: "1"
+        memory: 512Mi
   query_scheduler:
     enabled: true
-  # Continue using classic architecture (disable ingest storage)
-  # https://grafana.com/docs/helm-charts/mimir-distributed/latest/migration-guides/migrate-helm-chart-5.x-to-6.0/#continue-using-classic-architecture-disable-ingest-storage
   kafka:
     enabled: false
+  distributor:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        cpu: "1"
+        memory: 512Mi
+  ingester:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 50m
+        memory: 256Mi
+      limits:
+        cpu: "2"
+        memory: 1Gi
+  compactor:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        cpu: "1"
+        memory: 512Mi
+  store_gateway:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: "1"
+        memory: 512Mi
+  querier:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        cpu: "1"
+        memory: 512Mi
+  query_frontend:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+  ruler:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+  gateway:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 500m
+        memory: 128Mi
   mimir:
     structuredConfig:
       ingest_storage:
@@ -45,8 +212,19 @@ mimir-distributed:
         remote_timeout: null
       ingester:
         push_grpc_method_enabled: true
+      limits:
+        compactor_blocks_retention_period: 24h
+        ingestion_rate: 10000
+        max_global_series_per_user: 100000
 
 opentelemetry-collector:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
   alternateConfig:
     receivers:
       otlp:
@@ -57,7 +235,6 @@ opentelemetry-collector:
             endpoint: ${env:MY_POD_IP}:4318
             include_metadata: true
     processors:
-      # Used for Tempo to sample 50% of traces, based on TraceID
       probabilistic_sampler:
         sampling_percentage: 50
     service:
@@ -74,6 +251,13 @@ opentelemetry-collector:
                     without_units: true
 
 opentelemetry-collector-daemonset:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
   alternateConfig:
     receivers:
       otlp:
