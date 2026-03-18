@@ -430,7 +430,7 @@ print_env_variables
 write_shared_variables
 
 # Generate Cluster Config
-./generate_cluster_yaml.sh onprem
+../../installer/generate_cluster_yaml.sh onprem
 
 # Check if enable-app-orch.yaml is present and uncommented in the cluster config file
 if grep -q "^[[:space:]]*[^#]*-[[:space:]]*.*enable-app-orch\.yaml" "$ORCH_INSTALLER_PROFILE".yaml; then

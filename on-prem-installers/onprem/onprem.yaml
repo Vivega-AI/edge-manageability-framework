@@ -1,0 +1,61 @@
+root:
+  useLocalValues: true
+  clusterValues:
+    - orch-configs/profiles/enable-platform.yaml
+    - orch-configs/profiles/enable-o11y.yaml
+    - orch-configs/profiles/enable-kyverno.yaml
+    - orch-configs/profiles/enable-app-orch.yaml
+    - orch-configs/profiles/enable-cluster-orch.yaml
+    - orch-configs/profiles/enable-edgeinfra.yaml
+    - orch-configs/profiles/enable-full-ui.yaml
+    - orch-configs/profiles/enable-onprem.yaml
+    - orch-configs/profiles/enable-sre.yaml
+    - orch-configs/profiles/proxy-none.yaml
+    - orch-configs/profiles/profile-onprem.yaml
+    - orch-configs/profiles/alerting-emails.yaml
+    - orch-configs/profiles/o11y-onprem.yaml
+    - orch-configs/profiles/resource-default.yaml
+    - orch-configs/profiles/artifact-rs-production-noauth.yaml
+argo:
+  orchestratorVersion: v2025.2.0
+  project: onprem
+  namespace: onprem
+  clusterName: onprem
+  clusterDomain: vedge.dev.vivega.ai
+  deployRepoURL: "https://github.com/Vivega-AI/edge-manageability-framework.git"
+  deployRepoRevision: "main"
+  targetServer: "https://kubernetes.default.svc"
+  autosync: true
+  enabled:
+    copy-app-gitea-cred-to-fleet: true
+    copy-ca-cert-gitea-to-app: true
+    copy-ca-cert-gitea-to-cluster: true
+    copy-cluster-gitea-cred-to-fleet: true
+  o11y:
+    dedicatedEdgenodeEnabled: false
+    sre:
+      customerLabel: local
+      tls:
+        enabled: false
+        caSecretEnabled: false
+orchestratorDeployment:
+  targetCluster: onprem
+postCustomTemplateOverwrite:
+  argocd:
+    server:
+      service:
+        annotations:
+          metallb.universe.tf/address-pool: argocd-server
+  traefik:
+    service:
+      annotations:
+        metallb.universe.tf/address-pool: traefik
+  ingress-haproxy:
+    controller:
+      service:
+        annotations:
+          metallb.universe.tf/address-pool: haproxy-controller
+  metallb-config:
+    ArgoIP: 192.168.10.50
+    TraefikIP: 192.168.10.51
+    HaproxyIP: 192.168.10.52

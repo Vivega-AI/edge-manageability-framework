@@ -16,6 +16,7 @@ root:
     - orch-configs/profiles/enable-onprem.yaml
     - orch-configs/profiles/enable-sre.yaml
     # proxy group should be specified as the first post-"enable" profile
+    - orch-configs/profiles/enable-tracing.yaml    # ← ADD THIS
     - orch-configs/profiles/proxy-none.yaml
     - orch-configs/profiles/profile-onprem.yaml
     - orch-configs/profiles/alerting-emails.yaml

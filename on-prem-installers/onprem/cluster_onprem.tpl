@@ -40,7 +40,7 @@ argo:
   clusterDomain: ${CLUSTER_DOMAIN}
 
   ## Argo CD configs
-  deployRepoURL: "https://github.com/open-edge-platform/edge-manageability-framework"
+  deployRepoURL: "https://github.com/Vivega-AI/edge-manageability-framework.git"
   deployRepoRevision: "${DEPLOY_REPO_BRANCH}"
 
   targetServer: "https://kubernetes.default.svc"
