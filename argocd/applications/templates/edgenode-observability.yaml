@@ -4,7 +4,7 @@
 
 {{- $appName        := "edgenode-observability" }}
 {{- $namespace      := "orch-infra" }}
-{{- $syncWave       := "1000" }}
+{{- $syncWave       := "1004" }} #changed from 1000 to 1004
 ---
 {{- if (index .Values.argo.enabled $appName) }}
 apiVersion: argoproj.io/v1alpha1
@@ -19,7 +19,7 @@ spec:
   sources:
     - repoURL: {{ required "A valid chartRepoURL entry required!" .Values.argo.chartRepoURL }}
       chart: o11y/charts/{{$appName}}
-      targetRevision: 0.10.21
+      targetRevision: 0.10.22
       helm:
         releaseName: {{$appName}}
         valuesObject:

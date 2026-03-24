@@ -4,7 +4,7 @@
 
 {{- $appName        := "vault" }}
 {{- $namespace      := "orch-platform" }}
-{{- $syncWave       := "160" }}
+{{- $syncWave       := "162" }} #changed from 160 to 162
 ---
 {{- if (index .Values.argo.enabled $appName) }}
 apiVersion: argoproj.io/v1alpha1
