@@ -4,7 +4,7 @@
 
 {{- $appName        := "sre-exporter" }}
 {{- $namespace      := "orch-sre" }}
-{{- $syncWave       := "2000" }}
+{{- $syncWave       := "2006" }}  #changed from 2000 to 2006
 ---
 {{- if (index .Values.argo.enabled $appName) }}
 apiVersion: argoproj.io/v1alpha1

@@ -4,7 +4,7 @@
 
 {{- $appName        := "platform-keycloak" }}
 {{- $namespace      := "orch-platform" }}
-{{- $syncWave       := "150" }}
+{{- $syncWave       := "154" }} #changed from 150 to 154
 ---
 {{- if (index .Values.argo.enabled $appName) }}
 apiVersion: argoproj.io/v1alpha1
