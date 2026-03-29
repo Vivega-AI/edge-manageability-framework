@@ -13,7 +13,7 @@ loki:
       replication_factor: 1
   minio:
     image:
-      tag: RELEASE.2025-09-07T16-13-09Z
+      tag: RELEASE.2025-04-03T14-56-28Z  #RELEASE.2025-09-07T16-13-09Z
     mcImage:
       tag: RELEASE.2025-08-13T08-35-41Z
     resources:
@@ -111,7 +111,7 @@ grafana:
 mimir-distributed:
   minio:
     image:
-      tag: RELEASE.2025-09-07T16-13-09Z
+      tag: RELEASE.2025-04-03T14-56-28Z  #RELEASE.2025-09-07T16-13-09Z
     mcImage:
       tag: RELEASE.2025-08-13T08-35-41Z
     deploymentUpdate:
@@ -250,8 +250,6 @@ opentelemetry-collector:
 mimir-distributed:
   mimir:
     structuredConfig:
-      common:
-        replication_factor: 1
       ingester:
         ring:
           replication_factor: 1
