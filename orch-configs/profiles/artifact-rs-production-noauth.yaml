@@ -10,6 +10,6 @@ argo:
     ociRegistry: "registry-rs.edgeorchestration.intel.com"
     fileServer: "files-rs.edgeorchestration.intel.com"
   tokenRefresh: null
-  chartRepoURL: "registry-rs.edgeorchestration.intel.com/edge-orch"
-  rsChartRepoURL: "registry-rs.edgeorchestration.intel.com/edge-orch"
-  containerRegistryURL: "registry-rs.edgeorchestration.intel.com/edge-orch"
+  chartRepoURL: "registry-rs.harbor.vivegaai.com:9443/edge-orch"
+  rsChartRepoURL: "registry-rs.harbor.vivegaai.com:9443/edge-orch"
+  containerRegistryURL: "registry-rs.harbor.vivegaai.com:9443/edge-orch"
