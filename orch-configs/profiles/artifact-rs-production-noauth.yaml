@@ -7,7 +7,7 @@
 
 argo:
   releaseService:
-    ociRegistry: "registry-rs.edgeorchestration.intel.com"
+    ociRegistry: "registry-rs.harbor.vivegaai.com:9443"
     fileServer: "files-rs.edgeorchestration.intel.com"
   tokenRefresh: null
   chartRepoURL: "registry-rs.harbor.vivegaai.com:9443/edge-orch"

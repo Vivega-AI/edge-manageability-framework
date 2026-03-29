@@ -508,6 +508,37 @@ spec:
       serviceCIDR: 10.43.0.0/16
     service:
       name: "kube-dns"
+    servers:
+    - port: 53
+      zones:
+      - zone: .
+      plugins:
+      - name: errors
+      - name: health
+        configBlock: "lameduck 10s"
+      - name: ready
+      - name: kubernetes
+        parameters: cluster.local in-addr.arpa ip6.arpa
+        configBlock: |-
+          pods insecure
+          fallthrough in-addr.arpa ip6.arpa
+          ttl 30
+      - name: prometheus
+        parameters: "0.0.0.0:9153"
+      - name: hosts
+        configBlock: |-
+	  ${HARBOR_IP} registry-rs.harbor.vivegaai.com
+          ${HARBOR_IP} harbor.vivegaai.com
+          ${HARBOR_IP} registry-oci.harbor.vivegaai.com
+          fallthrough
+          fallthrough
+      - name: forward
+        parameters: ". /etc/resolv.conf"
+      - name: cache
+        parameters: "30"
+      - name: loop
+      - name: reload
+      - name: loadbalance
 EOF
 }
 
