@@ -16,7 +16,6 @@
 #   Options:
 #     -h, --help         Show help message
 #     --skip-download    Skip downloading packages (use existing ones)
-#     --harbor-setup     Configure Harbor registry access (CoreDNS + socat proxy)
 #     -y, --yes          Skip Docker credentials prompt and run non-interactively
 #     -t, --trace        Enable debug tracing
 #
@@ -33,7 +32,6 @@ SKIP_DOWNLOAD=false
 ENABLE_TRACE=false
 ASSUME_YES=false
 SETUP_HARBOR=false
-
 # Source main environment configuration if it exists
 MAIN_ENV_CONFIG="$(dirname "$0")/onprem.env"
 if [[ -f "$MAIN_ENV_CONFIG" ]]; then
@@ -68,136 +66,6 @@ set_artifacts_version() {
   )
 }
 
-
-
-setup_harbor_access() {
-  echo "🔧 Setting up Harbor registry access..."
-
-  # Extract hostname without port
-  HARBOR_HOSTNAME="${RELEASE_SERVICE_URL%%:*}"
-
-  if [ -z "${HARBOR_IP:-}" ] || [ -z "${RELEASE_SERVICE_URL:-}" ]; then
-    echo "❌ HARBOR_IP or RELEASE_SERVICE_URL not set in onprem.env"
-    exit 1
-  fi
-
-  # Install socat if needed
-  if ! command -v socat &>/dev/null; then
-    sudo apt-get install -y socat
-  fi
-
-  # Add Harbor to /etc/hosts
-  sudo sed -i "/$HARBOR_HOSTNAME/d" /etc/hosts
-  echo "$HARBOR_IP $HARBOR_HOSTNAME" | sudo tee -a /etc/hosts
-  echo "✅ Added $HARBOR_HOSTNAME → $HARBOR_IP to /etc/hosts"
-
-  # Create systemd service for socat proxy
-  sudo tee /etc/systemd/system/harbor-proxy.service << EOF
-[Unit]
-Description=Harbor Registry Proxy
-After=network.target tailscaled.service
-Wants=tailscaled.service
-
-[Service]
-ExecStart=/usr/bin/socat TCP-LISTEN:${HARBOR_PORT:-9443},fork,reuseaddr TCP:${HARBOR_IP}:${HARBOR_PORT:-9443}
-Restart=always
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-  sudo systemctl daemon-reload
-  sudo systemctl enable harbor-proxy
-  sudo systemctl start harbor-proxy
-  echo "✅ Harbor socat proxy service created and started"
-
-  # Add Tailscale route to main routing table so pods can reach Harbor
-  echo "🔧 Adding Tailscale route to main routing table..."
-
-  # Wait for tailscale0 interface to be ready
-  retries=0
-  until ip link show tailscale0 &>/dev/null; do
-    retries=$((retries + 1))
-    if [ "$retries" -ge 10 ]; then
-      echo "⚠️  tailscale0 not ready - skipping route add"
-      break
-    fi
-    echo "Waiting for tailscale0... ($retries/10)"
-    sleep 3
-  done
-
-  sudo ip route add 100.64.0.0/10 dev tailscale0 2>/dev/null || \
-    echo "Route already exists"
-  echo "✅ Tailscale route added"
-
-  # Create systemd service to persist Tailscale route across reboots
-  sudo tee /etc/systemd/system/tailscale-route.service << EOF
-[Unit]
-Description=Add Tailscale route to main routing table
-After=tailscaled.service network-online.target
-Wants=tailscaled.service
-
-[Service]
-Type=oneshot
-ExecStart=/bin/sh -c '/sbin/ip route add 100.64.0.0/10 dev tailscale0 2>/dev/null || true'
-RemainAfterExit=yes
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-  sudo systemctl daemon-reload
-  sudo systemctl enable tailscale-route
-  sudo systemctl start tailscale-route
-  echo "✅ Tailscale route persisted across reboots"
-
-  # Add Harbor CA cert to system trust store
-  echo "🔧 Adding Harbor CA cert to system trust store..."
-
-  retries=0
-  max_retries=10
-  until echo | openssl s_client -connect ${HARBOR_HOSTNAME}:${HARBOR_PORT:-9443} \
-    -showcerts 2>/dev/null | grep -q "BEGIN CERTIFICATE"; do
-    retries=$((retries + 1))
-    if [ "$retries" -ge "$max_retries" ]; then
-      echo "❌ Could not connect to Harbor after $max_retries attempts"
-      exit 1
-    fi
-    echo "Waiting for Harbor proxy... ($retries/$max_retries)"
-    sleep 3
-  done
-
-  echo | openssl s_client -connect ${HARBOR_HOSTNAME}:${HARBOR_PORT:-9443} \
-    -showcerts 2>/dev/null | openssl x509 -outform PEM | \
-    sudo tee /usr/local/share/ca-certificates/harbor-registry.crt > /dev/null
-
-  sudo update-ca-certificates
-  echo "✅ Harbor CA cert added to system trust store"
-
-  echo "✅ Harbor host and proxy configured"
-}
-
-
-
-
-setup_harbor_coredns() {
-  echo "🔧 Patching CoreDNS with Harbor host entry..."
-
-  HARBOR_HOSTNAME="${RELEASE_SERVICE_URL%%:*}"
-  # Wait for CoreDNS
-  echo "⏳ Waiting for CoreDNS to be ready..."
-  kubectl wait --for=condition=available deployment/rke2-coredns-rke2-coredns \
-    -n kube-system --timeout=300s 2>/dev/null || true
-
-  # Patch CoreDNS
-  kubectl patch configmap rke2-coredns-rke2-coredns -n kube-system \
-    --type merge -p "{\"data\":{\"Corefile\":\".:53 {\n    errors\n    health {\n        lameduck 10s\n    }\n    ready\n    hosts {\n        ${HARBOR_IP} ${HARBOR_HOSTNAME}\n        fallthrough\n    }\n    kubernetes  cluster.local  cluster.local in-addr.arpa ip6.arpa {\n        pods insecure\n        fallthrough in-addr.arpa ip6.arpa\n        ttl 30\n    }\n    prometheus  0.0.0.0:9153\n    forward  . /etc/resolv.conf\n    cache  30\n    loop\n    reload\n    loadbalance\n}\n\"}}"
-
-  kubectl rollout restart deployment rke2-coredns-rke2-coredns -n kube-system
-  kubectl rollout status deployment rke2-coredns-rke2-coredns -n kube-system
-  echo "✅ CoreDNS patched with Harbor host entry"
-}
 
 allow_config_in_runtime() {
   if [ "$ENABLE_TRACE" = true ]; then
@@ -244,12 +112,13 @@ allow_config_in_runtime() {
     unset DOCKER_USERNAME
     unset DOCKER_PASSWORD
   fi
+
 }
 
 usage() {
   cat >&2 <<EOF
 Purpose:
-Install OnPrem Edge Orchestrator pre-installation components including RKE2, dependencies,
+Install OnPrem Edge Orchestrator pre-installation components including RKE2, dependencies, 
 and package downloads. This script prepares the system for the main orchestrator installation.
 
 Prerequisites:
@@ -263,22 +132,18 @@ $(basename "$0") [OPTIONS]
 Examples:
 ./$(basename "$0")                    # Basic installation with onprem.env config
 ./$(basename "$0") --skip-download    # Skip package downloads (use existing packages)
-./$(basename "$0") --harbor-setup     # Configure Harbor registry access
 ./$(basename "$0") -y                 # Skip Docker credentials prompt, run non-interactively
 ./$(basename "$0") -t                 # Enable debug tracing
 
 Options:
     -h, --help                 Show this help message and exit
-
+    
     --skip-download            Skip downloading installer packages from registry
                                Useful for development/testing when packages already exist
-
-    --harbor-setup             Configure Harbor registry access via socat proxy and CoreDNS
-                               Requires HARBOR_IP, HARBOR_PORT set in onprem.env
-
+    
     -y, --yes                  Skip Docker credentials prompt and run non-interactively
                                Useful for automated deployments or CI/CD pipelines
-
+    
     -t, --trace                Enable bash debug tracing (set -x)
                                Shows detailed command execution for troubleshooting
 
@@ -288,8 +153,6 @@ Configuration:
     - DEPLOY_VERSION: Version of Edge Orchestrator to deploy
     - ORCH_INSTALLER_PROFILE: Deployment profile (onprem/onprem-dev)
     - DOCKER_USERNAME/DOCKER_PASSWORD: Docker Hub credentials
-    - HARBOR_IP: IP address of Harbor registry (required for --harbor-setup)
-    - HARBOR_PORT: Port of Harbor registry (default: 9443)
 
 EOF
 }
@@ -307,15 +170,41 @@ print_env_variables() {
 # Function to write shared variables to a configuration file for use by onprem_orch_install.sh
 write_shared_variables() {
   local config_file="$cwd/onprem.env"
-
+  
   # Update Docker credentials using common function
   update_config_variable "$config_file" "DOCKER_USERNAME" "${DOCKER_USERNAME}"
   update_config_variable "$config_file" "DOCKER_PASSWORD" "${DOCKER_PASSWORD}"
-
+  
   echo "Runtime configuration updated in: $config_file"
   echo "To use in onprem_orch_install.sh, source this file: source $config_file"
 }
 
+
+SETUP_HARBOR=false
+
+setup_harbor_access() {
+  echo "🔧 Setting up Harbor registry access..."
+  source "$SCRIPT_DIR/onprem.env"
+
+  if [ -z "${HARBOR_IP:-}" ] || [ -z "${RELEASE_SERVICE_URL:-}" ]; then
+    echo "❌ HARBOR_IP or RELEASE_SERVICE_URL not set in onprem.env"
+    exit 1
+  fi
+
+  # Add to /etc/hosts
+  sudo sed -i "/$RELEASE_SERVICE_URL/d" /etc/hosts
+  echo "$HARBOR_IP $RELEASE_SERVICE_URL" | sudo tee -a /etc/hosts
+  echo "✅ Added $RELEASE_SERVICE_URL to /etc/hosts"
+
+  # Install socat if needed
+  if ! command -v socat &>/dev/null; then
+    sudo apt-get install -y socat
+  fi
+
+  # Create systemd service for socat proxy
+  sudo tee /etc/systemd/system/harbor-proxy.service << EOF
+
+}
 ################################
 ##### INSTALL SCRIPT START #####
 ################################
@@ -363,15 +252,7 @@ set_artifacts_version
 check_oras
 install_yq
 
-# Setup Harbor access BEFORE downloads (socat proxy + /etc/hosts)
-if [[ "$SETUP_HARBOR" == true ]]; then
-  echo "=========================================="
-  echo "🔧 Setting up Harbor access before downloads"
-  echo "=========================================="
-  setup_harbor_access
-fi
-
-if [[ $SKIP_DOWNLOAD != true ]]; then
+if  [[ $SKIP_DOWNLOAD != true  ]]; then 
   # Cleanup and download .deb packages
   sudo rm -rf "${cwd:?}/${deb_dir_name:?}/"
 
@@ -392,7 +273,7 @@ if [[ $SKIP_DOWNLOAD != true ]]; then
   sudo chown -R _apt:root $deb_dir_name
 
   ## Cleanup and download .git packages
-  sudo rm -rf "${cwd:?}/${git_arch_name:?}/"
+  sudo rm -rf  "${cwd:?}/${git_arch_name:?}/"
 
   retry_count=0
   max_retries=10
@@ -407,7 +288,7 @@ if [[ $SKIP_DOWNLOAD != true ]]; then
     echo "Download failed. Retrying in $retry_delay seconds... ($retry_count/$max_retries)"
     sleep "$retry_delay"
   done
-else
+else 
   echo "Skipping packages download"
   sudo chown -R _apt:root $deb_dir_name
 fi
@@ -431,20 +312,56 @@ fi
 echo "RKE2 Installed"
 
 mkdir -p /home/"$USER"/.kube
-sudo cp /etc/rancher/rke2/rke2.yaml /home/"$USER"/.kube/config
-sudo chown -R "$USER":"$USER" /home/"$USER"/.kube
+sudo cp  /etc/rancher/rke2/rke2.yaml /home/"$USER"/.kube/config
+sudo chown -R "$USER":"$USER"  /home/"$USER"/.kube
 sudo chmod 600 /home/"$USER"/.kube/config
 
 # Write shared variables to configuration file for use by onprem_orch_install.sh
 write_shared_variables
 
-# Setup CoreDNS AFTER RKE2/kubectl is available
+
+# Between pre-install and main-install add:
 if [[ "$SETUP_HARBOR" == true ]]; then
-  echo "=========================================="
-  echo "🔧 Patching CoreDNS with Harbor host entry"
-  echo "=========================================="
-  setup_harbor_coredns
+  echo "🔧 Step 1.5: Setting up Harbor access"
+  echo "------------------------------------------"
+  setup_harbor_access
   echo "✅ Harbor setup completed!"
+  echo
+  echo "=========================================="
+  echo
 fi
+
+[Unit]
+Description=Harbor Registry Proxy
+After=network.target tailscaled.service
+Wants=tailscaled.service
+
+[Service]
+ExecStart=/usr/bin/socat TCP-LISTEN:${HARBOR_PORT:-9443},fork,reuseaddr TCP:${HARBOR_IP}:${HARBOR_PORT:-9443}
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+  sudo systemctl daemon-reload
+  sudo systemctl enable harbor-proxy
+  sudo systemctl start harbor-proxy
+  echo "✅ Harbor socat proxy service created and started"
+
+  # Wait for CoreDNS
+  echo "⏳ Waiting for CoreDNS..."
+  kubectl wait --for=condition=available deployment/rke2-coredns-rke2-coredns \
+    -n kube-system --timeout=300s 2>/dev/null || true
+
+  # Patch CoreDNS
+  kubectl patch configmap rke2-coredns-rke2-coredns -n kube-system \
+    --type merge -p "{\"data\":{\"Corefile\":\".:53 {\n    errors\n    health {\n        lameduck 10s\n    }\n    ready\n    hosts {\n        ${HARBOR_IP} ${RELEASE_SERVICE_URL}\n        fallthrough\n    }\n    kubernetes  cluster.local  cluster.local in-addr.arpa ip6.arpa {\n        pods insecure\n        fallthrough in-addr.arpa ip6.arpa\n        ttl 30\n    }\n    prometheus  0.0.0.0:9153\n    forward  . /etc/resolv.conf\n    cache  30\n    loop\n    reload\n    loadbalance\n}\n\"}}"
+
+  kubectl rollout restart deployment rke2-coredns-rke2-coredns -n kube-system
+  kubectl rollout status deployment rke2-coredns-rke2-coredns -n kube-system
+  echo "✅ CoreDNS patched"
+
 
 echo "End On Premise Edge Orchestrator pre-install"

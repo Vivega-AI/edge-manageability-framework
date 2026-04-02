@@ -93,6 +93,7 @@ Configuration:
 EOF
 }
 
+
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -143,6 +144,10 @@ echo "=========================================="
 echo "  Edge Orchestrator Full Installation"
 echo "=========================================="
 echo
+
+
+
+
 
 # Run pre-install
 echo "📦 Step 1/2: Running Pre-Install"
