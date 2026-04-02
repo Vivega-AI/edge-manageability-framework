@@ -28,3 +28,42 @@ orchestratorDeployment:
   dockerCacheCert: ""
   enableMailpit: ""
   targetCluster: ""
+
+postCustomTemplateOverwrite:
+  rs-proxy:
+    proxyTargetCA: |
+      -----BEGIN CERTIFICATE-----
+      MIIFyDCCA7CgAwIBAgIUC+/wzkgPDBwR5/kKMl4HzyDi28YwDQYJKoZIhvcNAQEL
+      BQAwHjEcMBoGA1UEAwwTaGFyYm9yLnZpdmVnYWFpLmNvbTAeFw0yNjA0MDEwNTQz
+      MDhaFw0zNjAzMjkwNTQzMDhaMB4xHDAaBgNVBAMME2hhcmJvci52aXZlZ2FhaS5j
+      b20wggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQCUrXoIJrnqRS+JhWUG
+      OTWyONKikcaUTxb9vn9N0Kb64hZOrTMyWqPR92WuERFQfUurqhSf7/TsnvHr/NpZ
+      39HzYbwB2piFHfruDCmrhvhVuGq21hKbYaefOlATBq+PHzYH44fnSiqjtXMjZtNy
+      Ja1AeD+dvHu6gKOaix1Pv4dvcblLGOzL4MeCdjFkt96ffDUbzY3BMUMKJ8eSCDTf
+      32JM1ppyX2M714axsbh2Wi/Y/nSLqQN5muKYMimIcdVDs0gDMD0t53a7pwS7Ssd2
+      uxzjfo6VybCN9KkTuFcX/yg0GT2B81fAxA0I0GCAZG48bgG9I7y8a8zW2EkL7yRm
+      DqR43poD+cy2WuiMbwMcVCGL0Jo8iYCqRFsL2r3XkBfm2KlQs6XKp+pc55XczOEk
+      iUcjIKeuKtcfSU+mtayJtXKQTXLez3p4WYGfM6+3fVFYp2lIs5oDL1Q0QQelldmj
+      UugOb9Qarqr1fUPKJbd7PjqO5Exxgg3xWtQkISPEq3YYoWhi9VAExH0pfsxOIqd7
+      +DO5R2nx5ZPzgFZZWRnLADZxwi4nyxAzIJtxGGlDS/KL60/Efc6cCeASR4YWdDe+
+      r1ItCC2EUMCsyVmZGYu+jVmpSEUsWoV1ROtuXHN2V7Lb8KJ9stBVHfVpk1hFLMWu
+      +CM7HSRAILycoT1qwW5tfLqaDQIDAQABo4H9MIH6MB0GA1UdDgQWBBSAPDZhUQty
+      RJifHw6H28eKN3IuxjAfBgNVHSMEGDAWgBSAPDZhUQtyRJifHw6H28eKN3IuxjAP
+      BgNVHRMBAf8EBTADAQH/MIGmBgNVHREEgZ4wgZuCE2hhcmJvci52aXZlZ2FhaS5j
+      b22CDHZpdmVnYWFpLmNvbYIgcmVnaXN0cnktb2NpLmhhcmJvci52aXZlZ2FhaS5j
+      b22CHHJlZ2lzdHJ5LmhhcmJvci52aXZlZ2FhaS5jb22CFSouaGFyYm9yLnZpdmVn
+      YWFpLmNvbYIfcmVnaXN0cnktcnMuaGFyYm9yLnZpdmVnYWFpLmNvbTANBgkqhkiG
+      9w0BAQsFAAOCAgEAGiq6C0MS23ZTw0qxCVrpzmqA3UqyPSwvhRfWBzsxq6uwZm+s
+      5ECAZMMffS2hlWWyXB/7WsnVL2kL/pCElJpZx5blpOY53zk/GidrFgbFMhkq6aw4
+      PO0URPj6lQUI+wUI/vqo+jDqEIHU7kPkgZvYJf8thRipdP35SGUb/PxFbRzz9zim
+      oOK8jdueY7/dQCf3frK3IRgXSo9NcRycCcBkQRluw0CWur2MqSudBx4VJ3qA7+GQ
+      bsY3aCbUuGv0xwwM0vLx5eEfPnIH7z7QoTaOXzGSH0xbPtGS7SphrxRiOUlxeFzk
+      igt8bd+qbKxCQ9VA8nlUwphDnH6AHgQiRF2I2g5+kmx0IhYDoYakKAtn5ElG6Y8S
+      gnXNqBDAe32ZA2GGvfbUNRptdR7h8kuSy3497zEtWP1DyJWWFGBKJFGAItynG11b
+      2AqyptpSn7sYE2VcSxd62RKcFp2qYAVY2I27Rz39455b6l1aZf+oLcnUgjLbkZLE
+      huJaykRXuZveyOztxpu9vpPIbah9tWOtqjFK78SjxLYVU/D6M5ag06WxwE7MoNIW
+      4ZQh+MvVLefaUf/hGSHde/oJF9vLwNrmUQCoCt3zzdk//a78fNYSkK8JLvzh+nKh
+      JKAh2Fi9yWXUP67B0vaGuaxl8oab0XxrzedggEwOOImfJAxBSI3LPnaHWBs=
+      -----END CERTIFICATE-----
+  rs-proxy-files:
+    proxyTargetCA: ""

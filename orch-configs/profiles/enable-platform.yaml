@@ -10,7 +10,7 @@ argo:
     auth-service: true
     ingress-haproxy: true
     cert-manager: true
-    oci-secret: true
+    oci-secret: false
     certificate-file-server: true
     component-status: true
     copy-app-gitea-cred-to-fleet: true
