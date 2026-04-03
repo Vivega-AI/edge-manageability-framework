@@ -182,8 +182,8 @@ EOF
 
     # Add to /etc/hosts
     NEXUS_HOSTNAME="${NEXUS_HOST%%:*}"
-    sudo sed -i "/$NEXUS_HOSTNAME/d" /etc/hosts
-    echo "$NEXUS_IP $NEXUS_HOSTNAME" | sudo tee -a /etc/hosts
+    sudo sed -i "/$NEXUS_HOST/d" /etc/hosts
+    echo "$NEXUS_IP $NEXUS_HOST" | sudo tee -a /etc/hosts
 
     # Create socat proxy for Nexus
     sudo tee /etc/systemd/system/nexus-proxy.service << EOF
@@ -204,6 +204,29 @@ EOF
     sudo systemctl daemon-reload
     sudo systemctl enable nexus-proxy
     sudo systemctl start nexus-proxy
+    # Add Nexus CA cert to system trust store
+    echo "Adding Nexus CA cert to system trust store..."
+
+    retries=0
+    max_retries=10
+    echo  ${NEXUS_HOST}:${NEXUS_PORT:-60444} 
+    until echo | openssl s_client -connect ${NEXUS_HOST}:${NEXUS_PORT:-60444} \
+      -showcerts 2>/dev/null | grep -q "BEGIN CERTIFICATE"; do
+      retries=$((retries + 1))
+      if [ "$retries" -ge "$max_retries" ]; then
+        echo "Could not connect to Nexus after $max_retries attempts"
+        exit 1
+      fi
+      echo "Waiting for Nexus... ($retries/$max_retries)"
+      sleep 3
+    done
+
+    echo | openssl s_client -connect ${NEXUS_HOST}:${NEXUS_PORT:-60444} \
+      -showcerts 2>/dev/null | openssl x509 -outform PEM | \
+      sudo tee /usr/local/share/ca-certificates/nexus-files.crt > /dev/null
+
+    sudo update-ca-certificates
+    echo "Nexus CA cert added to system trust store"
     echo "✅ Nexus proxy service created and started"
   fi
 }
