@@ -176,6 +176,36 @@ EOF
   echo "✅ Harbor CA cert added to system trust store"
 
   echo "✅ Harbor host and proxy configured"
+  # Setup Nexus proxy (if configured)
+  if [ -n "${NEXUS_IP:-}" ] && [ -n "${NEXUS_HOST:-}" ]; then
+    echo "🔧 Setting up Nexus registry access..."
+
+    # Add to /etc/hosts
+    NEXUS_HOSTNAME="${NEXUS_HOST%%:*}"
+    sudo sed -i "/$NEXUS_HOSTNAME/d" /etc/hosts
+    echo "$NEXUS_IP $NEXUS_HOSTNAME" | sudo tee -a /etc/hosts
+
+    # Create socat proxy for Nexus
+    sudo tee /etc/systemd/system/nexus-proxy.service << EOF
+[Unit]
+Description=Nexus Repository Proxy
+After=network.target tailscaled.service
+Wants=tailscaled.service
+
+[Service]
+ExecStart=/usr/bin/socat TCP-LISTEN:${NEXUS_PORT:-8081},fork,reuseaddr TCP:${NEXUS_IP}:${NEXUS_PORT:-8081}
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+    sudo systemctl daemon-reload
+    sudo systemctl enable nexus-proxy
+    sudo systemctl start nexus-proxy
+    echo "✅ Nexus proxy service created and started"
+  fi
 }
 
 
@@ -189,10 +219,9 @@ setup_harbor_coredns() {
   echo "⏳ Waiting for CoreDNS to be ready..."
   kubectl wait --for=condition=available deployment/rke2-coredns-rke2-coredns \
     -n kube-system --timeout=300s 2>/dev/null || true
-
   # Patch CoreDNS
   kubectl patch configmap rke2-coredns-rke2-coredns -n kube-system \
-    --type merge -p "{\"data\":{\"Corefile\":\".:53 {\n    errors\n    health {\n        lameduck 10s\n    }\n    ready\n    hosts {\n        ${HARBOR_IP} ${HARBOR_HOSTNAME}\n        fallthrough\n    }\n    kubernetes  cluster.local  cluster.local in-addr.arpa ip6.arpa {\n        pods insecure\n        fallthrough in-addr.arpa ip6.arpa\n        ttl 30\n    }\n    prometheus  0.0.0.0:9153\n    forward  . /etc/resolv.conf\n    cache  30\n    loop\n    reload\n    loadbalance\n}\n\"}}"
+    --type merge -p "{\"data\":{\"Corefile\":\".:53 {\n    errors\n    health {\n        lameduck 10s\n    }\n    ready\n    hosts {\n        ${HARBOR_IP} ${HARBOR_HOSTNAME}\n        ${NEXUS_IP} ${NEXUS_HOSTNAME}\n        fallthrough\n    }\n    kubernetes  cluster.local  cluster.local in-addr.arpa ip6.arpa {\n        pods insecure\n        fallthrough in-addr.arpa ip6.arpa\n        ttl 30\n    }\n    prometheus  0.0.0.0:9153\n    forward  . /etc/resolv.conf\n    cache  30\n    loop\n    reload\n    loadbalance\n}\n\"}}"
 
   kubectl rollout restart deployment rke2-coredns-rke2-coredns -n kube-system
   kubectl rollout status deployment rke2-coredns-rke2-coredns -n kube-system
