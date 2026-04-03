@@ -6,8 +6,8 @@
 argo:
   releaseService:
     ociRegistry: "registry-rs.harbor.vivegaai.com:9443"
-    #fileServer: "files-rs.edgeorchestration.intel.com"
-    fileServer: "registry-rs.harbor.vivegaai.com:9443"
+    fileServer: "files-rs.100.64.0.2:8081"
+    #fileServer: "registry-rs.harbor.vivegaai.com:9443"
   tokenRefresh: null
   chartRepoURL: "registry-rs.harbor.vivegaai.com:9443/edge-orch"
   rsChartRepoURL: "registry-rs.harbor.vivegaai.com:9443/edge-orch"
