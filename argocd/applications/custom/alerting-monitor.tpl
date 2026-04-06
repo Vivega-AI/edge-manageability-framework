@@ -47,7 +47,7 @@ initialRules:
 {{- end }}
 
 authentication:
-  oidcServer: https://keycloak.{{ .Values.argo.clusterDomain }}:443
+  oidcServer: "http://platform-keycloak.orch-platform.svc"
   oidcServerRealm: master
 webUIAddress: "https://web-ui.{{ .Values.argo.clusterDomain }}"
 observabilityUIAddress: "https://observability-ui.{{ .Values.argo.clusterDomain }}"
