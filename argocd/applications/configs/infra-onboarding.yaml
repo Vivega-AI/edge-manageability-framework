@@ -23,7 +23,7 @@ tinkerbell:
 
 onboarding-manager:
   managerArgs:
-    inventoryAddress: "inventory.orch-infra.svc.cluster.local:50051"
+    #inventoryAddress: "inventory.orch-infra.svc.cluster.local:50051"
     traceURL: "orchestrator-observability-opentelemetry-collector.orch-platform.svc:4318"
   traefikReverseProxy:
     enabled: true
