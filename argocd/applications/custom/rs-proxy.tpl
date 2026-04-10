@@ -47,3 +47,4 @@ env:
 resources:
   {{- toYaml . | nindent 2 }}
 {{- end }}
+proxyTargetRegistryCA: ""
