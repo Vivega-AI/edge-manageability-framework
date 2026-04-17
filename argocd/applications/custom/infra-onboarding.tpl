@@ -75,7 +75,8 @@ infra-config:
     systemConfigKernelPanicOnOops: "{{ index .Values.argo "infra-onboarding" "systemConfigKernelPanicOnOops" | default "1" }}"
     systemConfigKernelPanic: "{{ index .Values.argo "infra-onboarding" "systemConfigKernelPanic" | default "10" }}"
 
-    cdnSvc: {{ .Values.argo.releaseService.fileServer }}
+    cdnSvc: https://{{ .Values.argo.releaseService.fileServer }}
+    #cdnSvc: {{ .Values.argo.releaseService.fileServer }}
     provisioningSvc: tinkerbell-haproxy.{{ .Values.argo.clusterDomain }}
     tinkerSvc: tinkerbell-server.{{ .Values.argo.clusterDomain }}
     omSvc: onboarding-node.{{ .Values.argo.clusterDomain }}
