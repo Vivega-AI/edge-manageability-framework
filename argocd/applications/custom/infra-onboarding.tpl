@@ -44,7 +44,7 @@ infra-config:
     orchKeycloak: keycloak.{{ .Values.argo.clusterDomain }}:443
     orchTelemetry: telemetry-node.{{ .Values.argo.clusterDomain }}:443
     orchAttestationStatus: attest-node.{{ .Values.argo.clusterDomain }}:443
-    orchRegistry: {{ .Values.argo.releaseService.ociRegistry }}:9443
+    orchRegistry: {{ .Values.argo.releaseService.ociRegistry }}
     orchFileServer: {{ .Values.argo.releaseService.fileServer }}
     # TODO: Revisit the below routes - limit exposure and switch to MT GW endpoints.
     orchMPSHost: mps.{{ .Values.argo.clusterDomain }}:4433
