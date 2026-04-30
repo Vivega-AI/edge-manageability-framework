@@ -27,6 +27,9 @@ server:
   volumes:
     - name: vault-storage-config
       emptyDir: {}
+    - name: combined-ca        # ADD THIS
+      emptyDir: {}
+
 
   # volumeMounts is a list of volumeMounts for the main server container. These are rendered
   # via toYaml rather than pre-processed like the extraVolumes value.
@@ -35,7 +38,16 @@ server:
     - mountPath: /vault/userconfig/vault-storage-config
       name: vault-storage-config
       readOnly: true
+    - mountPath: /vault/combined-ca    # ADD THIS
+      name: combined-ca
+      readOnly: true
 
+  extraVolumes:                # ADD THIS BLOCK
+    - type: secret             # change to configMap if keycloak-ca is a ConfigMap
+      name: keycloak-ca
+
+  extraEnvironmentVars:        # ADD THIS BLOCK
+    SSL_CERT_FILE: /vault/combined-ca/ca-bundle.crt
   extraArgs: "-config=/vault/userconfig/vault-storage-config/storage.hcl"
   # Settings for the statefulSet used to run Vault.
   statefulSet:

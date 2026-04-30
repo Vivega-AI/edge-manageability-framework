@@ -114,6 +114,24 @@ server:
               key: PGDATABASE
         - name: HA_ENABLED
           value: {{ .Values.argo.vault.ha | default false | quote }}
+    - name: combine-ca-certs
+      image: alpine:3.22.2
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: [ALL]
+        seccompProfile:
+          type: RuntimeDefault
+      command: [sh, -c]
+      args:
+        - cp /etc/ssl/certs/ca-certificates.crt /vault/combined-ca/ca-bundle.crt &&
+          cat /vault/userconfig/keycloak-ca/keycloak-ca.crt >> /vault/combined-ca/ca-bundle.crt
+      volumeMounts:
+        - name: combined-ca
+          mountPath: /vault/combined-ca
+        - name: userconfig-keycloak-ca
+          mountPath: /vault/userconfig/keycloak-ca
+
     # This initContainer creates database tables for vault
     - name: init-table
       image: library/postgres:14.19-alpine3.22
