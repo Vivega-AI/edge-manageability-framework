@@ -49,4 +49,14 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ApplyOutOfSyncOnly=true
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      name: apiv2
+      namespace: orch-infra
+      jqPathExpressions:
+        - .spec.template.spec.initContainers
+        - .spec.template.spec.volumes
+        - .spec.template.spec.containers[].volumeMounts
+        - .spec.template.spec.containers[].env
 {{- end }}
