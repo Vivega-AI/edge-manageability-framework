@@ -17,12 +17,17 @@ host-manager:
     secretName: "tls-orch"
     tlsOption: "gateway-tls"
   oidc:
-    oidc_server_url: "https://keycloak.vedge.dev.vivega.ai/realms/master"
+    oidc_server_url: "http://platform-keycloak.orch-platform.svc/realms/master"
   multiTenancy:
     enforceMultiTenancy: "true"
   resources: null
   # https://doc.traefik.io/traefik/migrate/v2-to-v3-details/#kubernetes-crds-api-group-traefikcontainous
   traefikApiGroup: "traefik.io/v1alpha1"
+  # Mount the Cloudflare Origin CA so Go trusts keycloak.vedge.dev.vivega.ai JWKS endpoint
+  caBundle:
+    enabled: true
+    secretName: "cloudflare-origin-ca"
+    certKey: "ca.crt"
 
 maintenance-manager:
   inventory:
